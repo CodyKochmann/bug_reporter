@@ -1,0 +1,84 @@
+<style>
+#bug_report{top:2in;background:#000;height:auto;padding-bottom:.05in;font-family:'avenir next';position:fixed}#details_box,#message_box{border:none;width:97%;text-align:center;margin:.5% 1.5% 0}#details_box{text-align:justify;height:1in}#submit_button{color:#fff;width:100%;text-align:center;margin:0 auto;padding:.1in 0;display:none}#submit_button:hover{color:orange}#head{color:#fff;font-size:.14in;margin:0;text-align:center}
+</style>
+<p id="head">Find a bug? Have a suggestion?</p>
+<input type='text' placeholder='Tell me here.' maxlength="128" id='message_box' />
+<br/>
+<textarea id="details_box" maxlength="512" placeholder='And if you need to get a little more in depth?' name="details_box" spellcheck="false"></textarea>
+<p id='submit_button' type='submit' onClick='submit_bug()'>Submit</p>
+<script async defer>
+var b64=function(){
+    // small base64 object for easy encoding/decoding with b64.e and b64.d
+    // by: Cody Kochmann
+    this.e = function(a){return(window.btoa(unescape(encodeURIComponent(a))))};
+    this.d = function(a){return(decodeURIComponent(escape(window.atob(a))))};
+    this.eval = function(a){return(eval(decodeURIComponent(escape(window.atob(a)))))};
+}
+var grep = function(theUrl) { /* reference link:http://stackoverflow.com/questions/247483/http-get-request-in-javascript*/
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", theUrl, false);
+    xmlHttp.send(null);
+    return xmlHttp.responseText;
+}
+b64=new b64();
+var inject_css = function(a) {
+    var b = document.createElement("style");
+    b.innerHTML = a;
+    b.type = "text/css";
+    document.getElementsByTagName("head")[0].appendChild(b)
+}
+var timestamp= function(){
+    var t = new Date();
+    return(t.toJSON());
+}
+var bug_submitting=false;
+
+var submit_bug = function() {
+    alert("trying to send.")
+    if (false == bug_submitting) {
+        bug_submitting = true;
+        var b = {
+            content: b64.e($("#message_box").val()),
+            details: b64.e($("#details_box").val()),
+            date: timestamp()
+        };
+        b=b64.e(JSON.stringify(b));
+        $.ajax({
+            type: "POST",
+            url: "http://192.168.1.66:8080/update",
+            processData: false,
+            contentType: "application/json",
+            data: b,
+            success: function(s){alert(s);$("#bug_report").remove()},
+            dataType: "text"
+        });
+    }
+};
+var generate_active_width = function(dom_id,min_inches,flexing_percentage,max_inches){
+    var inject_css = function(a) {
+        var b = document.createElement("style");
+        b.innerHTML = a;
+        b.type = "text/css";
+        document.getElementsByTagName("head")[0].appendChild(b)
+    }
+    var current_inches = 0;
+    var iterations = 0.2;
+    var up_to_x_inches = 34;
+    var str = function(s){return(s.toString())};
+    var print = function(s){console.log(s)};
+    var output = "";
+    output+=("#"+dom_id+"{min-width:"+str(min_inches)+"in}");
+    for (var i = 0; i < parseInt(up_to_x_inches/iterations); i++) {
+        var current = iterations*i;
+        if (current >= min_inches && current < max_inches){
+            output+=("@media (min-width: "+str(current)+"in) and (max-width: "+str(current+iterations)+"in) {#"+dom_id+" {width: "+flexing_percentage+"%;margin:0 "+((100-flexing_percentage)*0.5)+"%;}}");
+        } else if (current >= max_inches){
+            var new_width = flexing_percentage*max_inches/current
+            output+=("@media (min-width: "+str(current)+"in) and (max-width: "+str(current+iterations)+"in) {#"+dom_id+" {width: "+str(new_width).substr(0,6)+"%;margin:0 "+str((100-new_width)*0.5).substr(0,6)+"%;}}");
+        }
+    };
+    inject_css(output);
+}
+generate_active_width("bug_report",3,90,6,32);
+</script>

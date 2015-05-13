@@ -15,7 +15,7 @@ def script_path(include_name=False):
         return(full_path)
 
 def write_to_csv(input_array):
-  with open( script_path() + '/note_database.csv', 'a') as csvfile:
+  with open( script_path() + '/bug_database.csv', 'a') as csvfile:
       spamwriter = csv.writer(csvfile, delimiter='|')
       # Uncomment this if you need verbose logging to debug anything
       # print "appending %s to clipboard_watcher.csv" % (input_array)
@@ -33,14 +33,27 @@ class Root(object):
         b64_body = cherrypy.request.body.read(int(cl))
         message=json.loads(base64.b64decode(b64_body))
         message["content"]=base64.b64encode(message["content"])
-        write_to_csv([message["id"],message["content"]])
+        if len(message["details"])==0:
+            message["details"]="none"
+        write_to_csv([message["date"],message["content"],message["details"]])
         # do_something_with(body)
-        return "Content Recieved"
+        return("Content Recieved")
 
     @cherrypy.expose
     def index(self):
         return(read_file("index.html"))
 
+    @cherrypy.expose
+    def bugs(self):
+        return(read_file("bugs.json"))
+
+    @cherrypy.expose
+    def bug_js(self):
+        return(read_file("bug_reporter.js"))
+
+    @cherrypy.expose
+    def bug_reporter(self):
+        return(read_file("bug_reporter.html"))
 
 cherrypy.config.update({'server.socket_host': '0.0.0.0',
                         'server.socket_port': 8080,
