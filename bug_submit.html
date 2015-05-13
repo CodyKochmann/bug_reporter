@@ -1,0 +1,62 @@
+<html><body>
+<style>
+body{width:100%;margin:0;background:rgba(0,0,0,0.7)}
+#bug_report{
+    top:20%;
+    background:rgb(0,0,0);
+    width:auto;
+    margin:10% auto;
+    max-width:90%;
+    height:auto;
+    padding-bottom:0.05in;
+    font-family:'avenir next';
+}
+#label, #updatebox{
+    border:none;
+    width:97%;
+    text-align:center;
+    margin:0.5% 1.5% 0;
+}
+#updatebox{
+    text-align:justify;
+    height:1in;
+}
+#submit_button{
+    color:white;
+    width:100%;
+    text-align:center;
+    margin:0 auto;
+    padding:0.1in 0;
+    display:none;
+}
+#submit_button:hover{
+    color:orange;
+}
+#head{
+    color:white;
+    font-size:0.14in;
+    margin:0;
+    text-align:center;
+}
+@media (min-width: 6in){
+    #bug_report{
+        width:5.4in;
+    }
+}
+</style>
+<div id="bug_report">
+<p id="head">Find a bug? Have a suggestion?</p>
+<input type='text' placeholder='Tell me here.' id='label' /><br/>
+<textarea id="updatebox" placeholder='And if you need to get a little more in depth?' name="updatebox" spellcheck="false"></textarea>
+<p id='submit_button' type='submit' onClick='submit_bug(); return false'>Submit</p>
+</div>
+<script>
+setInterval(function(){
+    if(document.getElementById('label').value.length > 0){
+        document.getElementById('submit_button').style.display="block";
+    } else {
+        document.getElementById('submit_button').style.display="none";
+    }
+},1000);
+</script>
+</body></html>
